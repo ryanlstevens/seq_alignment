@@ -42,11 +42,11 @@ Each algorithm should have the following methods :
 
 Python style guide : https://www.python.org/dev/peps/pep-0008/
 
-Key points"
+__KEY POINTS__
 
-__GENERAL__ 
-__4 space indention__ 
-__Limit lines to 80 characters__
+__GENERAL__    
+__4 space indention__    
+__Limit lines to 80 characters__   
 __No hanging indents for multi-line functions (this pep allows them, but I don't like them):__
 
 ```python
@@ -61,10 +61,10 @@ foo = long_func(
    ,var_two)
 ```
 
-__FUNCTIONS AND CLASSES__
-__Top-level functions + classes surrounded by 2 blank lines__
-__Methods inside classes surround by 1 blank line__
-__Explicitly define input type in functions__
+__FUNCTIONS AND CLASSES__   
+__Top-level functions + classes surrounded by 2 blank lines__  
+__Methods inside classes surround by 1 blank line__   
+__Explicitly define input type in functions__  
 
 ```python
 # Correct
@@ -74,8 +74,8 @@ def func(input : AnyStr)
 def func(input)
 ```
 
-__IMPORTS__
-__Imports should be one per line__
+__IMPORTS__   
+__Imports should be one per line__  
 
 ``` python
 # Correct
@@ -88,13 +88,13 @@ import os, sys
 # Allowed, if from same library
 from os import list, join
 ``` 
-__Import order : Standard libraries, related third party, local app specific __
+__Import order : Standard libraries, related third party, local app specific__  
 
 
-__NAMES__
-__Package and Modules : short, all-lowercase names__
-__Classes : camel case__
-__Errors : camel case, precede each error with name 'Error'__
-__Functions, Variable Names : lowercase, seperated by underscores__
-__Constants : all capitalized seperated by underscores__
+__NAMES__  
+__Package and Modules : short, all-lowercase names__   
+__Classes : camel case__     
+__Errors : camel case, precede each error with name 'Error'__     
+__Functions, Variable Names : lowercase, seperated by underscores__   
+__Constants : all capitalized seperated by underscores__   
 
