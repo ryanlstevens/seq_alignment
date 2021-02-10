@@ -26,3 +26,25 @@ print(np.array(wagner_fischer_init.match_alignment_table))
 print('\nBACKTRACE DIRECTIONS')
 wagner_fischer_init.make_backtrace_table()
 ```
+
+# For us
+
+## Module convention 
+
+Each algorithm should have the following methods :
+
+* __init__ : accepts string or list, and optional argument defining if user should get backtrace table
+* run : runs matching algorithm
+* align_matches : aligns strings 
+* make_backtrace_table : constructs backtrace directions 
+
+## Random stuff
+
+Python style guide : https://www.python.org/dev/peps/pep-0008/
+
+Key points
+* 4 space indention 
+* Limit lines to 79 characters
+
+
+I will periodically post any relevant information
