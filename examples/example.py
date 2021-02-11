@@ -24,4 +24,4 @@ print(np.array(wagner_fischer_init.match_alignment_table))
 
 # Make backtrace table 
 print('\nBACKTRACE DIRECTIONS')
-wagner_fischer_init.make_backtrace_table()
+np.array(wagner_fischer_init.make_backtrace_table())
