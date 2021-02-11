@@ -1,6 +1,7 @@
 ## Change directory 
 import os 
-os.chdir('/Users/ryanstevens/Documents/github/py_string_matchers')
+os.chdir('/Users/ryanstevens/Documents/github/py_string_matchers') #<- CHANGE TO PATH WHERE ROOT OF THIS FOLDER LIVES
+import numpy as np
 
 
 # ~~~ Wagner Fischer ~~~ #
@@ -23,4 +24,4 @@ print(np.array(wagner_fischer_init.match_alignment_table))
 
 # Make backtrace table 
 print('\nBACKTRACE DIRECTIONS')
-wagner_fischer_init.make_backtrace_table()
+np.array(wagner_fischer_init.make_backtrace_table())
