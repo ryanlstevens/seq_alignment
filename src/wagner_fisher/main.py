@@ -25,7 +25,7 @@ class wagner_fischer:
         
         
     
-    def run_matching(self):
+    def run(self):
 
         ## Create initial array to hold edit
         ##  dist values
@@ -93,7 +93,6 @@ class wagner_fischer:
 
         while (i,j) != (0,0):
             # Substitution/Replacement
-            direction=None
             if self.backtrace_array[i,j,2]==1:
                 i,j = (i-1,j-1)
             # Deletion
