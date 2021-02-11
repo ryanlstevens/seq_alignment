@@ -1,6 +1,7 @@
 ## Change directory 
 import os 
 os.chdir('/Users/ryanstevens/Documents/github/py_string_matchers') #<- CHANGE TO PATH WHERE ROOT OF THIS FOLDER LIVES
+import numpy as np
 
 
 # ~~~ Wagner Fischer ~~~ #
