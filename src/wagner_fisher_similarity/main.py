@@ -2,11 +2,26 @@ import numpy as np
 from itertools import product
 
 class wagner_fisher_similarity:
+    '''
+    Uses wagner-fischer algorithm to compute similarity score 
+      between two strings. Additionally, users can output 
+      backtrace tables created to run similarity score algorithm.
+    '''
 
     def __init__(self
                 ,str1
                 ,str2
                 ,backtrace=False):
+        '''
+        INPUT
+        ------
+        str1 : str or list of strings
+        str2 : str or list of strings
+        backtrace : boolean
+           When set to True, backtrace table is assigned to 
+           class parameter `backtrace_array` 
+          
+        '''
         
         # Set parameter variables
         self.str1 = str1 
@@ -31,6 +46,19 @@ class wagner_fisher_similarity:
         self.op_costs['Exact'] = 0
 
     def run(self):
+        '''
+        Run string distance algorithm, assumes the string distance 
+          can be found in the last row/column of the distance array.
+        
+        OUTPUT
+        ------
+        str1 : str or list of strings
+        str2 : str or list of strings
+        backtrace : boolean
+           When set to True, backtrace table is assigned to 
+           class parameter `backtrace_array` 
+          
+        '''
 
         ## Create initial array to hold edit
         ##  dist values
@@ -85,6 +113,9 @@ class wagner_fisher_similarity:
             
         # Get distance between strings
         self.match_distance = self.edit_array[-1,-1]
+
+        # Return distance between strings
+        return(self.match_distance)
     
     def _get_shortest_path(self):
         '''
