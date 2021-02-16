@@ -17,7 +17,7 @@ class local_similarity:
         flag for whether to perform backtrace
     edit_array : numpy.array
         array of edit distances
-    match_distance : float
+    match_distance : int
         optimal value of similarity problem
     backtrace_array : numpy.array
         3d binary array of backtrace operations. In 3rd dimension, 1st is 
@@ -65,8 +65,7 @@ class local_similarity:
         self.op_costs['Exact'] = 2
 
     def make_edit_array(self):
-        """Create edit array, which holds edit distance values
-        """
+        """Create edit array, which holds edit distance values"""
         
         ## Create initial array to hold edit
         ##  dist values
