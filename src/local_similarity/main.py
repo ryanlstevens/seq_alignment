@@ -2,6 +2,40 @@ import numpy as np
 from itertools import product
 
 class local_similarity:
+    """
+    A class used to compute local similarity
+
+    ...
+
+    Attributes
+    ----------
+    str1 : str or list of characters
+        first string to compare
+    str2 : str or list of characters
+        second string to compare
+    backtrace : bool
+        flag for whether to perform backtrace
+    edit_array : numpy.array
+        array of edit distances
+    match_distance : float
+        optimal value of similarity problem
+    backtrace_array : numpy.array
+        3d binary array of backtrace operations. In 3rd dimension, 1st is 
+        empty string, 2nd is insertion, 3rd is deletion, 4th is match
+    backtrace_path : list
+        list of indices showing the optimal backtrace path
+    backtrace_table : numpy.array
+        array showing the entire backtrace 
+    match_alignment_table : numpy.array
+        array with aligned strings in first 2 rows. 3rd row is edit actions
+
+    Methods
+    -------
+    make_edit_array()
+        Create edit array, which holds edit distance values
+    align_matches()
+        Aligns matches
+    """
 
     def __init__(self
                 ,str1
@@ -31,12 +65,14 @@ class local_similarity:
         self.op_costs['Exact'] = 2
 
     def make_edit_array(self):
-
+        """Create edit array, which holds edit distance values
+        """
+        
         ## Create initial array to hold edit
         ##  dist values
         ##
         ## Add extra row + column for empty string
-        self.edit_array = np.empty((self.len1,self.len2))
+        self.edit_array = np.empty((self.len1,self.len2),dtype= np.int8)
 
         ## Initialize first row + column of array
         ##  for the empty string value
@@ -44,47 +80,48 @@ class local_similarity:
         self.edit_array[0,:] = [0 for i in np.arange(0,self.len2)]
 
         if self.backtrace:
-            self.backtrace_array = np.zeros((self.len1,self.len2,4))
+            self.backtrace_array = np.zeros((self.len1,self.len2,4),dtype= bool)
 
         ## Fill in row by row
-        for row, col in product(range(1,self.len1),range(1,self.len2)):
+        for ii in range(1,self.len1):
+            for jj in range(1,self.len2):
             
-            # Get substrings to compare
-            sub1 = self.str1[row-1]
-            sub2 = self.str2[col-1]
-            
-            # Find minimum values using
-            #  bellman recursion
-            #
-            # Order is : [Zero String, Insert, Delete, Substitute or Exact Match]
+                # Get last letter from string, and compare value
+                sub1 = self.str1[ii-1]
+                sub2 = self.str2[jj-1]
+                
+                # Find minimum values using
+                #  bellman recursion
+                #
+                # Order is : [Zero String, Insert, Delete, Substitute or Exact Match]
 
-            # Value of substitute or exact match
-            t_ij = self.op_costs['Substitute']*(sub1!=sub2) + self.op_costs['Exact']*(1-(sub1!=sub2))
+                # Value of substitute or exact match
+                t_ij = self.op_costs['Substitute']*(sub1!=sub2) + self.op_costs['Exact']*(1-(sub1!=sub2))
 
-            # Values of zero string, inserting, deleting and substituting
-            action_values = [0
-                            ,self.edit_array[row,col-1]+self.op_costs['Insert']
-                            ,self.edit_array[row-1,col]+self.op_costs['Delete']
-                            ,self.edit_array[row-1,col-1]+t_ij,
-                            ]
+                # Values of zero string, inserting, deleting and substituting
+                action_values = [0
+                                ,self.edit_array[ii,jj-1]+self.op_costs['Insert']
+                                ,self.edit_array[ii-1,jj]+self.op_costs['Delete']
+                                ,self.edit_array[ii-1,jj-1]+t_ij,
+                                ]
 
-            # What is minimum value of action
-            max_val = np.max(action_values)
-            self.edit_array[row,col] = max_val
+                # What is minimum value of action
+                max_val = np.max(action_values)
+                self.edit_array[ii,jj] = max_val
 
-            if self.backtrace:
-                self.backtrace_array[row,col,np.where(action_values==max_val)] = 1
-
-        self.match_distance = self.edit_array[-1,-1]
+                if self.backtrace:
+                    self.backtrace_array[ii,jj,np.where(action_values==max_val)] = 1
     
     def _get_shortest_path(self):
-        '''
+        '''Gets the shortest path through edit array
+
         Requires backtrace array, set backtrace = True when 
           initializing class
         '''
         ## Start at max value of edit array
-
         i, j = np.unravel_index(np.argmax(self.edit_array),self.edit_array.shape)
+        self.match_distance = self.edit_array[i,j]
+
         self.backtrace_path = [(i,j)]
 
         while (i,j) != (0,0):
@@ -103,7 +140,8 @@ class local_similarity:
             self.backtrace_path.append((i,j))
 
     def align_matches(self):
-        '''
+        '''Align matches
+
         Requires backtrace array, set backtrace = True when 
           initializing class
         '''
