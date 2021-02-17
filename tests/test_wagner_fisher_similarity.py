@@ -1,13 +1,13 @@
 def wagner_fisher_setup():
 
     # ~~~ Wagner Fischer ~~~ #
-    from src.wagner_fisher_similarity import main as wagner_fisher_similarity
+    from seq_alignment.wagner_fisher_similarity.main import wagner_fisher_similarity
 
     str1=['v','i','n','e']
     str2=['v','i','n']  
 
     # Initalize matching class function
-    wf_init = wagner_fisher_similarity.wagner_fisher_similarity(str1,str2,True)
+    wf_init = wagner_fisher_similarity(str1,str2,True)
 
     # Run matching 
     wf_init.run()   

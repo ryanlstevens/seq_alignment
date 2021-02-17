@@ -4,10 +4,10 @@ def local_similarity_setup(str1,str2):
 
     # ~~~ Local Similarity ~~~ #
 
-    from src.local_similarity import main as local_similarity        
+    from seq_alignment.local_similarity.main import local_similarity
 
     # Initalize matching class function
-    ls_init = local_similarity.local_similarity(str1,str2,True)
+    ls_init = local_similarity(str1,str2,True)
 
     # Run matching 
     ls_init.make_edit_array()   
