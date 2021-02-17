@@ -170,6 +170,11 @@ class wagner_fisher_similarity:
         ## Index for str2 to iterate over
         col_idx = np.arange(1,self.len2)
 
+<<<<<<< HEAD
+=======
+        print('Row Num {0}, Values {1}'.format(curr_row_num-1,past_row))
+
+>>>>>>> 010556d (Added code speed ups to wagner fisher)
         ## Go row by row, keeping track of past row + current row only
         while curr_row_num < self.len1:
             # Define append function only once for speedup
@@ -198,6 +203,11 @@ class wagner_fisher_similarity:
             curr_row_num+=1
             past_row = curr_row 
             curr_row = [self.op_costs['Delete']*curr_row_num]
+<<<<<<< HEAD
+=======
+
+            print('Row Num {0}, Values {1}'.format(curr_row_num-1,past_row))
+>>>>>>> 010556d (Added code speed ups to wagner fisher)
             
         # Get distance between strings
         self.match_distance = past_row[-1]
