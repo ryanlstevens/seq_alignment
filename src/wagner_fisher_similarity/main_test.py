@@ -2,51 +2,25 @@ import numpy as np
 from itertools import product
 
 class wagner_fisher_similarity:
-    """
-    A class used to compute local similarity
+    '''Wagner-Fischer algorithm to compute similarity score between two strings
     
-    Attributes
-    ----------
-    str1 : str or list of characters
-        first string to compare
-    str2 : str or list of characters
-        second string to compare
-    backtrace : bool
-        flag for whether to perform backtrace
-    edit_array : numpy.array
-        array of edit distances
-    match_distance : int
-        optimal value of similarity problem
-    backtrace_array : numpy.array
-        3d binary array of backtrace operations. In 3rd dimension, 1st is 
-        empty string, 2nd is insertion, 3rd is deletion, 4th is match
-    backtrace_path : list
-        list of indices showing the optimal backtrace path
-    backtrace_table : numpy.array
-        array showing the entire backtrace 
-    match_alignment_table : numpy.array
-        array with aligned strings in first 2 rows. 3rd row is edit actions
-    
-    Methods
-    -------
-    make_edit_array()
-        Create edit array, which holds edit distance values
-    align_matches()
-        Aligns matches
-    """
+    Users can output backtrace tables created to run similarity score algorithm, 
+    by setting backtrace = `true` when initializing the class
+    '''
 
     def __init__(self
                 ,str1
                 ,str2
                 ,backtrace=False):
-        """
-        Inputs
+        '''
+        INPUT
         ------
         str1 : str or list of strings
         str2 : str or list of strings
-        backtrace : bool
-           flag for whether to perform backtrace
-        """
+        backtrace : boolean
+           When set to True, backtrace table is assigned to 
+           parameter `backtrace_array`  
+        '''
 
         # Set parameter variables
         self.str1 = str1 
@@ -73,31 +47,20 @@ class wagner_fisher_similarity:
         self.op_costs['Exact'] = 0
 
     def run(self):
-        """Run string distance algorithm to find maximum similarity score b/w strings
+        '''Run string distance algorithm to find maximum similarity score b/w strings
          
         Always assumes the string distance can be found in last row/column
-        of edit distance array. 
+        of edit distance array
 
-
-        Methods
+        OUTPUTS
         -------
-        _run_with_backtrace()
-            runs algorithm, storing backtrace values in backtrace_array
-        _run_without_backtrace()
-            runs algorithm, not storing backtrace values
-        _align_matches()
-            uses backtrace values to find optimal alignment path, 
-            returns alignment of strings and edit actions used to create
-            alignment
-
-        Outputs 
-        -------
-        edit_distance : float
-            minimum number of edits to transform str1 into str2
-        match_alignment_table : numpy.array (optional)
-            array with aligned strings in first 2 rows. 3rd row is edit actions.
-            only occrus if backtrace = True. 
-        """
+        self.edit_distance : float
+            Minimum number of edits to transform str1 into str2
+        self.alignment : list of strings (optional)
+            Alignment of str1 and str2, and operations used to convert
+            str1 to str2. This will only be set if backtrace set to True
+            when initializing the class
+        '''
 
         if self.backtrace:
             # Run string matching, keeping edit distance array
@@ -112,16 +75,17 @@ class wagner_fisher_similarity:
             self._run_without_backtrace()
     
     def _run_with_backtrace(self):
-        """Run algorithm while storing edit distance array
+        ''' Run string distance algorithm while storing edit distance array
+        
+        Assumes the string distance is found in the last row/column 
+        of the distance array. This function assumes you will want to
+        
         
         OUTPUT
         ------
-        backtrace_array : np.array
-            3d binary array of backtrace operations. 1st is 
-            empty string, 2nd is insertion, 3rd is deletion
-        match_distance : int
-            optimal value of similarity problem
-        """
+        str1 : str or list of strings
+        str2 : str or list of strings
+        '''
 
         ## Create initial array to hold edit
         ##  dist values
