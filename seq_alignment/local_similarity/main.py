@@ -45,13 +45,15 @@ class local_similarity:
         # Set parameter variables
         self.str1 = str1 
         self.str2 = str2
-        self.backtrace = backtrace
         self.edit_array = None
         self.match_distance = None
-        self.backtrace_array = None
-        self.backtrace_path = None
-        self.backtrace_table = None
-        self.match_alignment_table = None
+        self.backtrace = backtrace
+
+        if self.backtrace:
+            self.backtrace_array = None
+            self.backtrace_path = None
+            self.backtrace_table = None
+            self.match_alignment_table = None
         
         # Set helper values
         self.len1 = len(self.str1) + 1 # Count empty string
@@ -71,15 +73,23 @@ class local_similarity:
         ##  dist values
         ##
         ## Add extra row + column for empty string
+<<<<<<< HEAD:seq_alignment/local_similarity/main.py
         self.edit_array = np.empty((self.len1,self.len2),dtype= np.int8)
+=======
+        self.edit_array = np.empty((self.len1,self.len2), dtype=np.int8)
+>>>>>>> 926b788a5b052b1f7f6ac37951f060a5d2b4c9f0:src/local_similarity/main.py
 
         ## Initialize first row + column of array
         ##  for the empty string value
-        self.edit_array[:,0] = [0 for i in np.arange(0,self.len1)]
-        self.edit_array[0,:] = [0 for i in np.arange(0,self.len2)]
+        self.edit_array[:,0] = 0
+        self.edit_array[0,:] = 0
 
         if self.backtrace:
+<<<<<<< HEAD:seq_alignment/local_similarity/main.py
             self.backtrace_array = np.zeros((self.len1,self.len2,4),dtype= bool)
+=======
+            self.backtrace_array = np.zeros((self.len1,self.len2,4), dtype=bool)
+>>>>>>> 926b788a5b052b1f7f6ac37951f060a5d2b4c9f0:src/local_similarity/main.py
 
         ## Fill in row by row
         for ii in range(1,self.len1):
