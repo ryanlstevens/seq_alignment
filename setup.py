@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="py_string_matchers", # Replace with your own username
+    name="seq_alignment_rls542", # Replace with your own username
     version="0.0.1",
     author="Ryan Stevens and James Nesbit",
     author_email="ryan.louis.stevens@gmail.com",
