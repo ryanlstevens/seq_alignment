@@ -15,9 +15,9 @@ def create_test_data(path_to_data):
 
 
 # ~~~ Create timing function ~~~ #
-def run_matching(wf_class,test_data,backtrace=False):
+def run_matching(run_function,test_data,backtrace=False):
     for elems in test_data:
         # Initalize matching class function
-        wf_init = wf_class.wagner_fisher_similarity(elems[0],elems[1],backtrace)
+        wf_init = run_function(elems[0],elems[1],backtrace)
         # Run matching 
         wf_init.run() 

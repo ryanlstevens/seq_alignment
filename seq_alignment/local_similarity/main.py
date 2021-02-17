@@ -40,13 +40,16 @@ class local_similarity:
     def __init__(self
                 ,str1
                 ,str2
-                ,backtrace=False):
+                ,backtrace=False
+                ,op_costs={'Delete':-1
+                          ,'Insert':-1
+                          ,'Substitute':-1
+                          ,'Exact':2}):
         
         # Set parameter variables
         self.str1 = str1 
         self.str2 = str2
         self.edit_array = None
-        self.match_distance = None
         self.backtrace = backtrace
 
         if self.backtrace:
@@ -60,24 +63,59 @@ class local_similarity:
         self.len2 = len(self.str2) + 1 # Count empty string
 
         # Set values of cost of operations
-        self.op_costs = {}
-        self.op_costs['Delete'] = -1
-        self.op_costs['Insert'] = -1
-        self.op_costs['Substitute'] = -1
-        self.op_costs['Exact'] = 2
+        self.op_costs = op_costs
 
-    def make_edit_array(self):
+        # Maximum string distance must be greater than insert + deleting all
+        self.match_distance = self.len1*self.op_costs['Delete'] + \
+                              self.len2*self.op_costs['Insert']
+
+    def run(self):
+        """Run string distance algorithm to find maximum similarity score b/w strings
+         
+        Always assumes the string distance is maximum value of the edit distance array
+
+
+        Methods
+        -------
+        _run_with_backtrace()
+            runs algorithm, storing backtrace values in backtrace_array
+        _run_without_backtrace()
+            runs algorithm, not storing backtrace values
+        _align_matches()
+            uses backtrace values to find optimal alignment path, 
+            returns alignment of strings and edit actions used to create
+            alignment
+
+        Outputs 
+        -------
+        edit_distance : float
+            minimum number of edits to transform str1 into str2
+        match_alignment_table : numpy.array (optional)
+            array with aligned strings in first 2 rows. 3rd row is edit actions.
+            only occrus if backtrace = True. 
+        """
+
+        if self.backtrace:
+            # Run string matching, keeping edit distance array
+            self._run_with_backtrace()
+
+            # Create string alignment from str1 to str2,
+            #  with edit distance operations
+            self._align_matches()
+        
+        else:
+            # Run string matching, storing edit distance array
+            self._run_without_backtrace()
+
+
+    def _run_with_backtrace(self):
         """Create edit array, which holds edit distance values"""
         
         ## Create initial array to hold edit
         ##  dist values
         ##
         ## Add extra row + column for empty string
-<<<<<<< HEAD:seq_alignment/local_similarity/main.py
         self.edit_array = np.empty((self.len1,self.len2),dtype= np.int8)
-=======
-        self.edit_array = np.empty((self.len1,self.len2), dtype=np.int8)
->>>>>>> 926b788a5b052b1f7f6ac37951f060a5d2b4c9f0:src/local_similarity/main.py
 
         ## Initialize first row + column of array
         ##  for the empty string value
@@ -85,11 +123,7 @@ class local_similarity:
         self.edit_array[0,:] = 0
 
         if self.backtrace:
-<<<<<<< HEAD:seq_alignment/local_similarity/main.py
             self.backtrace_array = np.zeros((self.len1,self.len2,4),dtype= bool)
-=======
-            self.backtrace_array = np.zeros((self.len1,self.len2,4), dtype=bool)
->>>>>>> 926b788a5b052b1f7f6ac37951f060a5d2b4c9f0:src/local_similarity/main.py
 
         ## Fill in row by row
         for ii in range(1,self.len1):
@@ -99,7 +133,7 @@ class local_similarity:
                 sub1 = self.str1[ii-1]
                 sub2 = self.str2[jj-1]
                 
-                # Find minimum values using
+                # Find maximum values using
                 #  bellman recursion
                 #
                 # Order is : [Zero String, Insert, Delete, Substitute or Exact Match]
@@ -114,13 +148,70 @@ class local_similarity:
                                 ,self.edit_array[ii-1,jj-1]+t_ij,
                                 ]
 
-                # What is minimum value of action
+                # What is maximum value of action
                 max_val = np.max(action_values)
                 self.edit_array[ii,jj] = max_val
 
+                # Keep track of global maximum 
+                if max_val > self.match_distance:
+                    self.match_distance = max_val
+
                 if self.backtrace:
                     self.backtrace_array[ii,jj,np.where(action_values==max_val)] = 1
+        
     
+    def _run_without_backtrace(self):
+        """Create edit array, which holds edit distance values"""
+
+
+        ## Initialize first row of array + first element of next row
+        ##  for the empty string value
+        past_row = [0]*self.len2
+        curr_row_num = 1
+        curr_row = [0]
+
+        ## Index for str2 to iterate over
+        col_idx = np.arange(1,self.len2)
+
+        ## Go row by row, keeping track of past row + current row only
+        while curr_row_num < self.len1:
+            # Define append function only once for speed-up
+            curr_row_append = curr_row.append
+            for col_num in col_idx:
+                # Get substrings to compare
+                last_ltr_1 = self.str1[curr_row_num-1]
+                last_ltr_2 = self.str2[col_num-1]
+
+                # Find maximum values using
+                #  bellman recursion
+                #
+                # Order is : [Insert, Delete, Substitute or Exact Match]
+
+                # Value of substitute or exact match
+                t_ij = self.op_costs['Substitute']*(last_ltr_1!=last_ltr_2) + self.op_costs['Exact']*(1-(last_ltr_1!=last_ltr_2))
+
+                # Values of inserting, deleting and substituting
+                max_val = max(
+                            [
+                            0
+                            ,curr_row[col_num-1]+self.op_costs['Insert']
+                            ,past_row[col_num]+self.op_costs['Delete']
+                            ,past_row[col_num-1]+t_ij
+                            ]
+                            )
+                curr_row_append(max_val)
+
+                # Keep track of global maximum 
+                if max_val > self.match_distance:
+                    self.match_distance = max_val
+
+                
+            # Moving onto to comparing next letter in the first string 
+            # i.e. moving down a row
+            curr_row_num+=1
+            past_row = curr_row 
+            curr_row = [0]
+       
     def _get_shortest_path(self):
         '''Gets the shortest path through edit array
 
@@ -148,7 +239,7 @@ class local_similarity:
                 i,j = (i-1,j-1)
             self.backtrace_path.append((i,j))
 
-    def align_matches(self):
+    def _align_matches(self):
         '''Align matches
 
         Requires backtrace array, set backtrace = True when 
@@ -187,3 +278,35 @@ class local_similarity:
                 str2_aligned.append(' ')
 
         self.match_alignment_table = np.array([str1_aligned,str2_aligned,action])
+
+    def make_backtrace_table(self):
+            '''
+            Requires backtrace array, set backtrace = True when 
+            initializing class
+            '''
+
+            # Run string matching
+            self.run()
+
+            # Initialize list to hold arrows
+            # Index is [row][col]
+            self.backtrace_table = []
+
+            # Get total # cols and rows
+            rows = self.backtrace_array.shape[0]
+            cols = self.backtrace_array.shape[1]
+
+            # Loop through row and col to get direction
+            for i in range(0,rows):
+                row_elems = []
+                for j in range(0,cols):
+                    directions=''
+                    btrace_elems = self.backtrace_array[i,j,:]
+                    if btrace_elems[0]==1:
+                        directions=directions+'⇐'
+                    if btrace_elems[1]==1:
+                        directions=directions+'⇑'
+                    if btrace_elems[2]==1:
+                        directions=directions+'⇖'
+                    row_elems.append(directions)
+                self.backtrace_table.append(row_elems)

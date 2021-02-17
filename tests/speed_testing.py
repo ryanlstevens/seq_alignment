@@ -22,10 +22,10 @@ sys.path.insert(0,parentdir)
 # Get path to data files
 path_to_data = os.path.join(parentdir,'data/seq_alignments/seq_alignment.csv')
 
-# Import string algo classes
-from src.wagner_fisher_similarity import main as wf_curr
-from src.wagner_fisher_similarity import main_test as wf_new
-from src.helpers.speed_test import create_test_data, run_matching
+# PYTHON RELOAD THE SOURCE FILE
+from seq_alignment.local_similarity.main import local_similarity as wf_curr
+from seq_alignment.local_similarity.main_test import local_similarity_test as wf_new
+from seq_alignment.helpers.speed_test import create_test_data, run_matching
 from functools import partial 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -39,10 +39,10 @@ SPEED_IMPROVEMENT_THRESHOLD = 2   #<- Speed improvement > than this, then test i
 test_data = create_test_data(path_to_data)
 
 # Run speed test on old code + new code #
-curr_version = timeit.Timer(partial(run_matching,wf_class=wf_curr,test_data=test_data,backtrace=False))
-new_version = timeit.Timer(partial(run_matching,wf_class=wf_new,test_data=test_data,backtrace=False))
-curr_version_run = curr_version.timeit(10)
-new_version_run = new_version.timeit(10)
+curr_version = timeit.Timer(partial(run_matching,run_function=wf_curr,test_data=test_data,backtrace=False))
+new_version = timeit.Timer(partial(run_matching,run_function=wf_new,test_data=test_data,backtrace=False))
+curr_version_run = curr_version.timeit(2)
+new_version_run = new_version.timeit(2)
 
 # Create variables indicating whether there was a speed improvement
 #  and change color of message to green if there is and red if there is no
@@ -52,7 +52,7 @@ outcome_color = bcolors.OKGREEN if speed_test_outcome else bcolors.FAIL
 outcome_message = 'SUCCESSFUL SPEED IMPROVEMENT' if speed_test_outcome else 'NO SPEED IMPROVEMENT' 
 
 # Return improvement
-print('{color_start}{outcome_message} : Improvement by {run_time_change:2.2f}x{color_end}'.format(color_start=outcome_color
+print('{color_start}{outcome_message}{color_end} : New code improves Old code by {color_start}{run_time_change:2.2f}x{color_end}'.format(color_start=outcome_color
                                                                                                  ,color_end=bcolors.ENDC
                                                                                                  ,outcome_message=outcome_message
                                                                                                  ,run_time_change=run_time_change))

@@ -4,15 +4,14 @@ def local_similarity_setup(str1,str2):
 
     # ~~~ Local Similarity ~~~ #
 
-    from src.local_similarity import main as local_similarity        
+    from seq_alignment.local_similarity import main as local_similarity        
 
     # Initalize matching class function
     ls_init = local_similarity.local_similarity(str1,str2,True)
 
     # Run matching 
-    ls_init.make_edit_array()   
+    ls_init.run()   
 
-    ls_init.align_matches()
     alignment = np.array(ls_init.match_alignment_table)
 
     return alignment

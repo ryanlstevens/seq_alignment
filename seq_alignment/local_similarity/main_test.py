@@ -1,10 +1,12 @@
 import numpy as np
 from itertools import product
 
-class wagner_fisher:
+class local_similarity_test:
     """
     A class used to compute local similarity
-    
+
+    ...
+
     Attributes
     ----------
     str1 : str or list of characters
@@ -26,7 +28,7 @@ class wagner_fisher:
         array showing the entire backtrace 
     match_alignment_table : numpy.array
         array with aligned strings in first 2 rows. 3rd row is edit actions
-    
+
     Methods
     -------
     make_edit_array()
@@ -42,21 +44,12 @@ class wagner_fisher:
                 ,op_costs={'Delete':-1
                           ,'Insert':-1
                           ,'Substitute':-1
-                          ,'Exact':0}):
-        """
-        Inputs
-        ------
-        str1 : str or list of strings
-        str2 : str or list of strings
-        backtrace : bool
-           flag for whether to perform backtrace
-        """
-
+                          ,'Exact':2}):
+        
         # Set parameter variables
         self.str1 = str1 
         self.str2 = str2
         self.edit_array = None
-        self.match_distance = None
         self.backtrace = backtrace
 
         if self.backtrace:
@@ -72,11 +65,14 @@ class wagner_fisher:
         # Set values of cost of operations
         self.op_costs = op_costs
 
+        # Maximum string distance must be greater than insert + deleting all
+        self.match_distance = self.len1*self.op_costs['Delete'] + \
+                              self.len2*self.op_costs['Insert']
+
     def run(self):
         """Run string distance algorithm to find maximum similarity score b/w strings
          
-        Always assumes the string distance can be found in last row/column
-        of edit distance array. 
+        Always assumes the string distance is maximum value of the edit distance array
 
 
         Methods
@@ -110,99 +106,69 @@ class wagner_fisher:
         else:
             # Run string matching, storing edit distance array
             self._run_without_backtrace()
-    
-    def _run_with_backtrace(self):
-        """Run algorithm while storing edit distance array
-        
-        OUTPUT
-        ------
-        backtrace_array : np.array
-            3d binary array of backtrace operations. 1st is 
-            empty string, 2nd is insertion, 3rd is deletion
-        match_distance : int
-            optimal value of similarity problem
-        """
 
+
+    def _run_with_backtrace(self):
+        """Create edit array, which holds edit distance values"""
+        
         ## Create initial array to hold edit
         ##  dist values
         ##
         ## Add extra row + column for empty string
-        self.edit_array = np.empty((self.len1,self.len2), dtype=np.int8)
+        self.edit_array = np.empty((self.len1,self.len2),dtype= np.int8)
 
         ## Initialize first row + column of array
         ##  for the empty string value
-        self.edit_array[:,0] = [i*self.op_costs['Delete'] for i in np.arange(0,self.len1)]
-        self.edit_array[0,:] = [i*self.op_costs['Insert'] for i in np.arange(0,self.len2)]
+        self.edit_array[:,0] = 0
+        self.edit_array[0,:] = 0
 
-        ## Initalize matrix for backtrace values
-        self.backtrace_array = np.zeros((self.len1,self.len2,3), dtype=bool)
+        if self.backtrace:
+            self.backtrace_array = np.zeros((self.len1,self.len2,4),dtype= bool)
 
-        ## Fill in row by row, keeping 
-        ##   track of backtrace values 
-        for row, col in product(range(1,self.len1), range(1,self.len2)):
+        ## Fill in row by row
+        for ii in range(1,self.len1):
+            for jj in range(1,self.len2):
             
-            # Get substrings to compare
-            sub1 = self.str1[row-1]
-            sub2 = self.str2[col-1]
-            
-            # Find minimum values using
-            #  bellman recursion
-            #
-            # Order is : [Insert, Delete, Substitute or Exact Match]
+                # Get last letter from string, and compare value
+                sub1 = self.str1[ii-1]
+                sub2 = self.str2[jj-1]
+                
+                # Find maximum values using
+                #  bellman recursion
+                #
+                # Order is : [Zero String, Insert, Delete, Substitute or Exact Match]
 
-            # Value of substitute or exact match
-            t_ij = self.op_costs['Substitute']*(sub1!=sub2) + self.op_costs['Exact']*(1-(sub1!=sub2))
+                # Value of substitute or exact match
+                t_ij = self.op_costs['Substitute']*(sub1!=sub2) + self.op_costs['Exact']*(1-(sub1!=sub2))
 
-            # Values of inserting, deleting and substituting
-            action_values = [self.edit_array[row,col-1]+self.op_costs['Insert']
-                            ,self.edit_array[row-1,col]+self.op_costs['Delete']
-                            ,self.edit_array[row-1,col-1]+t_ij
-                            ]
+                # Values of zero string, inserting, deleting and substituting
+                action_values = [0
+                                ,self.edit_array[ii,jj-1]+self.op_costs['Insert']
+                                ,self.edit_array[ii-1,jj]+self.op_costs['Delete']
+                                ,self.edit_array[ii-1,jj-1]+t_ij,
+                                ]
 
-            # What is minimum value of action
-            max_val = np.max(action_values)
-            self.edit_array[row,col] = max_val
-            
-            # Which action resulted in minimum value
-            self.backtrace_array[row,col,np.where(action_values==max_val)] = 1
+                # What is maximum value of action
+                max_val = np.max(action_values)
+                self.edit_array[ii,jj] = max_val
 
-        # Once hit the first col/row can only do deletions/insertions
-        self.backtrace_array[:,0,:] = 0 
-        self.backtrace_array[:,0,1] = 1 
-        self.backtrace_array[0,:,0] = 1
-        self.backtrace_array[0,:,1:] = 0
-            
-        # Get distance between strings
-        self.match_distance = self.edit_array[-1,-1]
+                # Keep track of global maximum 
+                if max_val > self.match_distance:
+                    self.match_distance = max_val
 
+                if self.backtrace:
+                    self.backtrace_array[ii,jj,np.where(action_values==max_val)] = 1
+        
+    
     def _run_without_backtrace(self):
-        '''
-        Run string distance algorithm, assumes the string distance 
-          can be found in the last row/column of the distance array.
-        
-        OUTPUT
-        ------
-        str1 : str or list of strings
-        str2 : str or list of strings
-          
-        '''
+        """Create edit array, which holds edit distance values"""
 
-        '''
-        Run string distance algorithm, assumes the string distance 
-          can be found in the last row/column of the distance array.
-        
-        OUTPUT
-        ------
-        str1 : str or list of strings
-        str2 : str or list of strings
-          
-        '''
 
         ## Initialize first row of array + first element of next row
         ##  for the empty string value
-        past_row = list(map(lambda i: i*self.op_costs['Insert'],np.arange(0,self.len2)))
+        past_row = [0]*self.len2
         curr_row_num = 1
-        curr_row = [self.op_costs['Delete']*curr_row_num]
+        curr_row = [0]
 
         ## Index for str2 to iterate over
         col_idx = np.arange(1,self.len2)
@@ -225,80 +191,60 @@ class wagner_fisher:
                 t_ij = self.op_costs['Substitute']*(last_ltr_1!=last_ltr_2) + self.op_costs['Exact']*(1-(last_ltr_1!=last_ltr_2))
 
                 # Values of inserting, deleting and substituting
-                curr_row_append(max([curr_row[col_num-1]+self.op_costs['Insert']
-                                    ,past_row[col_num]+self.op_costs['Delete']
-                                    ,past_row[col_num-1]+t_ij]
-                                )
-                )
+                max_val = max(
+                            [
+                            0
+                            ,curr_row[col_num-1]+self.op_costs['Insert']
+                            ,past_row[col_num]+self.op_costs['Delete']
+                            ,past_row[col_num-1]+t_ij
+                            ]
+                            )
+                curr_row_append(max_val)
+
+                # Keep track of global maximum 
+                if max_val > self.match_distance:
+                    self.match_distance = max_val
+
+                
             # Moving onto to comparing next letter in the first string 
             # i.e. moving down a row
             curr_row_num+=1
             past_row = curr_row 
-            curr_row = [self.op_costs['Delete']*curr_row_num]
-            
-        # Get distance between strings
-        self.match_distance = past_row[-1]
-    
+            curr_row = [0]
+        
     def _get_shortest_path(self):
-        '''
+        '''Gets the shortest path through edit array
+
         Requires backtrace array, set backtrace = True when 
           initializing class
         '''
+        ## Start at max value of edit array
+        i, j = np.unravel_index(np.argmax(self.edit_array),self.edit_array.shape)
+        self.match_distance = self.edit_array[i,j]
 
-        ## Start at last element of array
-        i, j = self.len1-1, self.len2-1
         self.backtrace_path = [(i,j)]
 
         while (i,j) != (0,0):
-            # Substitution/Exact Match
-            if self.backtrace_array[i,j,2]==1:
-                i,j = (i-1,j-1)
-            # Deletion
-            elif self.backtrace_array[i,j,1]==1:
-                i,j = (i-1,j)
+            # Empty
+            if self.backtrace_array[i,j,0]==1:
+                break
             # Insertion
-            elif self.backtrace_array[i,j,0]==1:
+            if self.backtrace_array[i,j,1]==1:
                 i,j = (i,j-1)
+            # Deletion
+            elif self.backtrace_array[i,j,2]==1:
+                i,j = (i-1,j)
+            # Substitution/Exact Match
+            elif self.backtrace_array[i,j,3]==1:
+                i,j = (i-1,j-1)
             self.backtrace_path.append((i,j))
 
-    def make_backtrace_table(self):
-        '''
-        Requires backtrace array, set backtrace = True when 
-          initializing class
-        '''
-
-        # Run string matching
-        self.run()
-
-        # Initialize list to hold arrows
-        # Index is [row][col]
-        self.backtrace_table = []
-
-        # Get total # cols and rows
-        rows = self.backtrace_array.shape[0]
-        cols = self.backtrace_array.shape[1]
-
-        # Loop through row and col to get direction
-        for i in range(0,rows):
-            row_elems = []
-            for j in range(0,cols):
-                directions=''
-                btrace_elems = self.backtrace_array[i,j,:]
-                if btrace_elems[0]==1:
-                    directions=directions+'⇐'
-                if btrace_elems[1]==1:
-                    directions=directions+'⇑'
-                if btrace_elems[2]==1:
-                    directions=directions+'⇖'
-                row_elems.append(directions)
-            self.backtrace_table.append(row_elems)
-    
     def _align_matches(self):
-        '''
+        '''Align matches
+
         Requires backtrace array, set backtrace = True when 
           initializing class
         '''
-        
         # Get shortest path
         self._get_shortest_path()
         
@@ -333,3 +279,5 @@ class wagner_fisher:
 
         self.match_alignment_table = np.array([str1_aligned,str2_aligned,action])
 
+
+    
