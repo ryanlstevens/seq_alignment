@@ -1,8 +1,18 @@
-# seq_alignment : A tool for sequence alignment and edit distances [![Build Status](https://travis-ci.com/ryanlstevens/py_string_matchers.svg?token=x6iEoqTBFHFvu6oqChJH&branch=main)](https://travis-ci.com/ryanlstevens/py_string_matchers)
+# seq_alignment : A python tool for sequence alignment and edit distances [![Build Status](https://travis-ci.com/ryanlstevens/py_string_matchers.svg?token=x6iEoqTBFHFvu6oqChJH&branch=main)](https://travis-ci.com/ryanlstevens/py_string_matchers)
 
 Module to determine distances between two strings (or two lists of strings). The primary use case of this package is to allow users to both compute distance measures using different distance algorithms. Additionally, we provide additional functionality to both visualize the alignment of the two strings. This allows users to determine how one string is transformed into another.
 
 For reference on differences between global and local alignment, see Chapter 11 and 12 of [Algorithms on Strings, Trees, and Sequences](https://www.amazon.com/Algorithms-Strings-Trees-Sequences-Computational/dp/0521585198).
+
+# Installation
+
+Project is available on pypi, installation via pip:
+
+```bash
+
+pip install seq_alignment
+
+```
 
 # Algorithms Available
 
