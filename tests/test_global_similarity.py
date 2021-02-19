@@ -1,13 +1,13 @@
-def wagner_fisher_setup(backtrace=True):
+def global_similarity_setup(backtrace=True):
 
     # ~~~ Wagner Fischer ~~~ #
-    from seq_alignment.wagner_fisher  import main as wagner_fisher
+    from seq_alignment import global_similarity
 
     str1=['v','i','n','e']
     str2=['v','i','n']  
 
     # Initalize matching class function
-    wf_init = wagner_fisher.wagner_fisher(str1,str2,backtrace)
+    wf_init = global_similarity(str1,str2,backtrace)
 
     # Run matching 
     wf_init.run()   
@@ -16,11 +16,11 @@ def wagner_fisher_setup(backtrace=True):
 
 
 
-def test_wagner_fisher_alignment():
+def test_global_similarity_alignment():
     
     import numpy as np
 
-    wf_init = wagner_fisher_setup()
+    wf_init = global_similarity_setup()
 
     wf_init.run()
     alignment = np.array(wf_init.match_alignment_table)
@@ -33,11 +33,11 @@ def test_wagner_fisher_alignment():
 
 
 
-def test_wagner_fisher_backtrace():
+def test_global_similarity_backtrace():
     
     import numpy as np
 
-    wf_init = wagner_fisher_setup() 
+    wf_init = global_similarity_setup() 
 
     # Run matching
     wf_init.run()
@@ -60,8 +60,8 @@ def test_backtrace_result_same():
 
     # Initialize two classes, one with backtrace 
     #  and one without backtrace
-    wf_backtrace = wagner_fisher_setup(True)
-    wf_no_backtrace = wagner_fisher_setup(False)
+    wf_backtrace = global_similarity_setup(True)
+    wf_no_backtrace = global_similarity_setup(False)
 
     # Run string distance 
     wf_backtrace.run()

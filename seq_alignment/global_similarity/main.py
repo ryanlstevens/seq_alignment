@@ -3,9 +3,11 @@ from itertools import product
 from copy import copy
 import operator
 
-class wagner_fisher:
+class global_similarity:
     """
-    A class used to compute local similarity
+    A class used to compute global similarity
+
+    Use "Wanger Fischer" dynamic programming algorithm
     
     Attributes
     ----------
