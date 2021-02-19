@@ -11,7 +11,7 @@ setuptools.setup(
     description="A package to compute edit distance measurements and sequence alignments.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ryanlstevens/py_string_matchers",
+    url="https://github.com/ryanlstevens/seq_alignment",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
