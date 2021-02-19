@@ -1,9 +1,5 @@
 # Change directory 
-import os 
-
 import numpy as np
-
-os.chdir("C:/Users/jmcgn/Desktop/py_string_matchers/") #<- CHANGE TO PATH WHERE ROOT OF THIS FOLDER LIVES
 
 # ----------------------
 # GLOBAL ALIGNMENT RUNS
