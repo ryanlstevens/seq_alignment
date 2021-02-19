@@ -1,5 +1,6 @@
 import numpy as np
 from itertools import product
+import operator
 
 class local_similarity:
     """
@@ -44,7 +45,8 @@ class local_similarity:
                 ,op_costs={'Delete':-1
                           ,'Insert':-1
                           ,'Substitute':-1
-                          ,'Exact':2}):
+                          ,'Exact':2}
+                ,test=operator.eq):
         
         # Set parameter variables
         self.str1 = str1 
@@ -52,11 +54,8 @@ class local_similarity:
         self.edit_array = None
         self.backtrace = backtrace
 
-        if self.backtrace:
-            self.backtrace_array = None
-            self.backtrace_path = None
-            self.backtrace_table = None
-            self.match_alignment_table = None
+        # Create testing function
+        self.test = test
         
         # Set helper values
         self.len1 = len(self.str1) + 1 # Count empty string
@@ -96,6 +95,13 @@ class local_similarity:
         """
 
         if self.backtrace:
+
+            # Initialize backtrace arrays
+            self.backtrace_array = None
+            self.backtrace_path = None
+            self.backtrace_table = None
+            self.match_alignment_table = None
+            
             # Run string matching, keeping edit distance array
             self._run_with_backtrace()
 
@@ -162,25 +168,32 @@ class local_similarity:
     
     def _run_without_backtrace(self):
         """Create edit array, which holds edit distance values"""
+        ## Get operation costs into a dict
+        INSERT = self.op_costs['Insert']
+        DELETE = self.op_costs['Delete']
+        SUBSTITUTE = self.op_costs['Substitute']
+        EXACT = self.op_costs['Exact']
 
+        ## SET VARIABLES WE NEED FOR RUN
+        len1 = self.len1
+        len2 = self.len2
+        str1 = self.str1
+        str2 = self.str2
+        test = self.test
 
         ## Initialize first row of array + first element of next row
         ##  for the empty string value
-        past_row = [0]*self.len2
-        curr_row_num = 1
-        curr_row = [0]
+        past_row = [0] * (len2)
+        for i in range(0,len2):
+            past_row[i] = i*DELETE
 
-        ## Index for str2 to iterate over
-        col_idx = np.arange(1,self.len2)
-
+        ## Initialize current row 
+        curr_row = [0] * (len2)
+        
         ## Go row by row, keeping track of past row + current row only
-        while curr_row_num < self.len1:
-            # Define append function only once for speed-up
-            curr_row_append = curr_row.append
-            for col_num in col_idx:
-                # Get substrings to compare
-                last_ltr_1 = self.str1[curr_row_num-1]
-                last_ltr_2 = self.str2[col_num-1]
+        for row_num in range(1,len1):
+            curr_row[0] = DELETE*row_num
+            for col_num in range(1,len2):
 
                 # Find maximum values using
                 #  bellman recursion
@@ -188,29 +201,28 @@ class local_similarity:
                 # Order is : [Insert, Delete, Substitute or Exact Match]
 
                 # Value of substitute or exact match
-                t_ij = self.op_costs['Substitute']*(last_ltr_1!=last_ltr_2) + self.op_costs['Exact']*(1-(last_ltr_1!=last_ltr_2))
+                
+                t_ij = EXACT if test(str1[row_num-1],str2[col_num-1]) else SUBSTITUTE
 
                 # Values of inserting, deleting and substituting
-                max_val = max(
-                            [
-                            0
-                            ,curr_row[col_num-1]+self.op_costs['Insert']
-                            ,past_row[col_num]+self.op_costs['Delete']
-                            ,past_row[col_num-1]+t_ij
-                            ]
-                            )
-                curr_row_append(max_val)
-
+                max_val = max(0
+                                        ,curr_row[col_num-1]+INSERT
+                                        ,past_row[col_num]+DELETE
+                                        ,past_row[col_num-1]+t_ij
+                                        )
+                curr_row[col_num] = max_val
+                
                 # Keep track of global maximum 
                 if max_val > self.match_distance:
                     self.match_distance = max_val
 
-                
             # Moving onto to comparing next letter in the first string 
             # i.e. moving down a row
-            curr_row_num+=1
-            past_row = curr_row 
-            curr_row = [0]
+            for i in range(1,len2):
+                past_row[i] = curr_row[i]
+
+
+        
        
     def _get_shortest_path(self):
         '''Gets the shortest path through edit array

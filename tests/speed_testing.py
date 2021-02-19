@@ -23,8 +23,10 @@ sys.path.insert(0,parentdir)
 path_to_data = os.path.join(parentdir,'data/seq_alignments/seq_alignment.csv')
 
 # PYTHON RELOAD THE SOURCE FILE
-from seq_alignment.local_similarity.main import local_similarity as wf_curr
-from seq_alignment.local_similarity.main_test import local_similarity_test as wf_new
+os.chdir('../')
+print(os.getcwd())
+from seq_alignment.wagner_fisher.main import wagner_fisher as wf_curr
+from seq_alignment.wagner_fisher.main_test import wagner_fisher as wf_new
 from seq_alignment.helpers.speed_test import create_test_data, run_matching
 from functools import partial 
 

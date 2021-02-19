@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="seq_alignment_rls542", # Replace with your own username
-    version="0.0.1",
+    version="0.0.5",
     author="Ryan Stevens and James Nesbit",
     author_email="ryan.louis.stevens@gmail.com",
     description="A package to compute edit distance measurements and sequence alignments.",
