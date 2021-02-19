@@ -1,6 +1,5 @@
 import numpy as np
 from itertools import product
-from copy import copy
 import operator
 
 class global_similarity:
