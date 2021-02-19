@@ -2,99 +2,62 @@
 
 Module to determine distances between two strings (or two lists of strings). The primary use case of this package is to allow users to both compute distance measures using different distance algorithms. Additionally, we provide additional functionality to both visualize the alignment of the two strings. This allows users to determine how one string is transformed into another.
 
+For reference on differences between global and local alignment, see Chapter 11 and 12 of [Algorithms on Strings, Trees, and Sequences](https://www.amazon.com/Algorithms-Strings-Trees-Sequences-Computational/dp/0521585198).
+
 # Algorithms Available
 
-## Wagner Fischer
+## Global Alignment (Wagner Fischer)
+
+To run the matching, you import `global_similarity` class, initialize with the strings you want to compare (accepts strings or list of strings), and then run your algorithm.
+
+The main options available are whether to compute back-trace, to not compute backtrace and return on edit distance (or string similarity) values set `backtrace = False` when initalizing the class.
 
 ```python
+## Run algo getting ONLY edit distance 
+## 
+## This runs fast due to not having to store
+## backtrace values
+
+from seq_alignment import global_similarity
+
 # Test values
 str1=['v','i','n','e']
 str2=['v','i','n']
 
 # Initalize matching class function
-wagner_fischer_init = wagner_fischer(str1,str2,True)
+sim_init = global_similarity(str1,str2,False)
 
 # Run matching 
-wagner_fischer_init.run_matching()
+sim_init.run()
 
-# Get alignment 
-wagner_fischer_init.align_matches()
-print('ALIGNMENT TABLE')
-print(np.array(wagner_fischer_init.match_alignment_table))
-
-# Make backtrace table 
-print('\nBACKTRACE DIRECTIONS')
-wagner_fischer_init.make_backtrace_table()
+# Get edit distance
+print("EDIT DISTANCE")
+print(sim_init.match_distance)
 ```
 
-# For us
+## Local Alignment (Smith Waterman)
 
-## Module convention 
-
-Each algorithm should have the following methods :
-
-* __init__ : accepts string or list, and optional argument defining if user should get backtrace table
-* run : runs matching algorithm
-* align_matches : aligns strings 
-* make_backtrace_table : constructs backtrace directions 
-
-## Random stuff
-
-Python style guide : https://www.python.org/dev/peps/pep-0008/
-
-__KEY POINTS__
-
-__GENERAL__    
-__4 space indention__    
-__Limit lines to 80 characters__   
-__No hanging indents for multi-line functions (this pep allows them, but I don't like them):__
+Same syntax to running global alignment, but now you import the `local_similarity` class.
 
 ```python
+## Run algo getting ONLY edit distance 
+## 
+## This runs fast due to not having to store
+## backtrace values
 
-# Aligned with opening delimiter
-foo = long_func(var_one
-               ,var_two)
+from seq_alignment import local_similarity
 
-# Hanging indent (I don't like)
-foo = long_func(
-    var_one
-   ,var_two)
+# Test values
+str1=['v','i','n','e']
+str2=['v','i','n']
+
+# Initalize matching class function
+sim_init = local_similarity(str1,str2,False)
+
+# Run matching 
+sim_init.run()
+
+# Get edit distance
+print("EDIT DISTANCE")
+print(sim_init.match_distance)
 ```
-
-__FUNCTIONS AND CLASSES__   
-__Top-level functions + classes surrounded by 2 blank lines__  
-__Methods inside classes surround by 1 blank line__   
-__Explicitly define input type in functions__  
-
-```python
-# Correct
-def func(input : AnyStr)
-
-# Not as good
-def func(input)
-```
-
-__IMPORTS__   
-__Imports should be one per line__  
-
-``` python
-# Correct
-import os
-import sys
-
-# Incorrect
-import os, sys
-
-# Allowed, if from same library
-from os import list, join
-``` 
-__Import order : Standard libraries, related third party, local app specific__  
-
-
-__NAMES__  
-__Package and Modules : short, all-lowercase names__   
-__Classes : camel case__     
-__Errors : camel case, precede each error with name 'Error'__     
-__Functions, Variable Names : lowercase, seperated by underscores__   
-__Constants : all capitalized seperated by underscores__   
-
