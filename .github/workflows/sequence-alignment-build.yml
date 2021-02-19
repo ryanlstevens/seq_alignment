@@ -1,4 +1,4 @@
-name: sequence-alignment-build
+name: Git Build
 
 on: [push]
 
