@@ -5,53 +5,86 @@ import numpy as np
 
 os.chdir("C:/Users/jmcgn/Desktop/py_string_matchers/") #<- CHANGE TO PATH WHERE ROOT OF THIS FOLDER LIVES
 
-# ~~~~~~~~~~~~~~~~~~~~~~ #
-# ~~~ Wagner Fischer ~~~ #
-# ~~~~~~~~~~~~~~~~~~~~~~ #
+# ----------------------
+# GLOBAL ALIGNMENT RUNS
+# ----------------------
 
-from src.wagner_fisher import main as wagner_fischer
+## Run algo getting both edit distance +
+##  backtrace table
 
-# Test values
-str1=['v','i','n','e']
-str2=['v','i','n']
-
-# Initalize matching class function
-wagner_fischer_init = wagner_fischer.wagner_fischer(str1,str2,True)
-
-# Run matching 
-wagner_fischer_init.run()
-
-# Get alignment 
-wagner_fischer_init.align_matches()
-print('ALIGNMENT TABLE')
-print(np.array(wagner_fischer_init.match_alignment_table))
-
-# Make backtrace table 
-print('\nBACKTRACE DIRECTIONS')
-print(np.array(wagner_fischer_init.make_backtrace_table())) 
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-# ~~~ Wagner Fischer Similarity ~~~ #
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-
-from src.wagner_fisher_similarity import main as wagner_fisher_similarity
+from seq_alignment import global_similarity
 
 # Test values
 str1=['v','i','n','e']
 str2=['v','i','n']
 
 # Initalize matching class function
-wf_similarity_init = wagner_fisher_similarity.wagner_fisher_similarity(str1,str2,True)
+sim_init = global_similarity(str1,str2,True)
 
 # Run matching 
-wf_similarity_init.run()
+sim_init.run()
+
+# Get edit distance
+print("EDIT DISTANCE")
+print(sim_init.match_distance)
 
 # Get alignment 
-wf_similarity_init.align_matches()
-print('ALIGNMENT TABLE')
-print(np.array(wf_similarity_init.match_alignment_table))
+print('\nALIGNMENT TABLE')
+print(np.array(sim_init.match_alignment_table))
 
 # Make backtrace table 
 print('\nBACKTRACE DIRECTIONS')
-print(np.array(wf_similarity_init.make_backtrace_table())) 
+print(np.array(sim_init.make_backtrace_table())) 
+
+
+## Run algo getting ONLY edit distance 
+## 
+## This runs faster due to not having to store
+## backtrace values
+
+from seq_alignment import global_similarity
+
+# Test values
+str1=['v','i','n','e']
+str2=['v','i','n']
+
+# Initalize matching class function
+sim_init = global_similarity(str1,str2,False)
+
+# Run matching 
+sim_init.run()
+
+# Get edit distance
+print("EDIT DISTANCE")
+print(sim_init.match_distance)
+
+# ----------------------
+# LOCAL ALIGNMENT RUNS
+# ----------------------
+
+## Run algo getting both edit distance +
+##  backtrace table
+
+from seq_alignment import local_similarity
+
+# Test values
+str1=['v','i','n','e']
+str2=['v','i','n']
+
+# Initalize matching class function
+sim_init = local_similarity(str1,str2,True)
+
+# Run matching 
+sim_init.run()
+
+# Get edit distance
+print("EDIT DISTANCE")
+print(sim_init.match_distance)
+
+# Get alignment 
+print('\nALIGNMENT TABLE')
+print(np.array(sim_init.match_alignment_table))
+
+# Make backtrace table 
+print('\nBACKTRACE DIRECTIONS')
+print(np.array(sim_init.make_backtrace_table())) 
